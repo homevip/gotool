@@ -1,4 +1,4 @@
-module gotool
+module github.com/homevip/gotool
 
 go 1.24.2
 
