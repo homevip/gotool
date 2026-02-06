@@ -2,8 +2,9 @@ package hstring
 
 import (
 	"fmt"
-	"gotool/util/htime"
 	"testing"
+
+	"github.com/homevip/gotool/util/htime"
 )
 
 // 获取 UUID
