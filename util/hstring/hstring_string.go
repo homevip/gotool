@@ -6,9 +6,11 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/bwmarrin/snowflake"
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/guuid"
@@ -79,6 +81,38 @@ func BuilderOrderSn() string {
 	rs := sup(r, 4)
 	n := fmt.Sprintf("%s%s%s%s", s, ms, ps, rs)
 	return n
+}
+
+// 全局雪花节点 + 互斥锁(保证线程安全）
+var (
+	snowNode *snowflake.Node
+	once     sync.Once // 保证节点只初始化一次
+)
+
+func SnowflakeID() (unique int64, err error) {
+
+	// 使用sync.Once保证节点只初始化一次，线程安全
+	once.Do(func() {
+		var initErr error
+		snowNode, initErr = snowflake.NewNode(1)
+		if initErr != nil {
+			err = initErr // 将初始化错误传递出去
+		}
+	})
+
+	// 检查初始化是否失败
+	if err != nil {
+		return 0, fmt.Errorf("初始化雪花节点失败: %w", err)
+	}
+
+	if snowNode == nil {
+		return 0, fmt.Errorf("雪花节点初始化后为空")
+	}
+
+	// 生成唯一ID
+	unique = snowNode.Generate().Int64()
+
+	return
 }
 
 // 对长度不足n的数字前面补0
