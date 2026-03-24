@@ -1,63 +1,59 @@
 package htime
 
 import (
-	"time"
-
-	"github.com/gogf/gf/v2/os/gtime"
 	carbon "github.com/golang-module/carbon/v2"
 )
 
+// 获取北京时间当前时间
+func Now() *carbon.Carbon {
+	// return carbon.Now(carbon.Shanghai) // 上海时间
+	return carbon.Now(carbon.PRC) // 中国时间
+}
+
 // 获取当前时间戳/秒
 func GetUnix() int64 {
-	return time.Now().Unix()
+	return Now().Timestamp()
 }
 
 // 获取当前毫秒
 func GetUnixMilli() int64 {
-	return time.Now().UnixMilli()
+	return Now().TimestampMilli()
 }
 
 // 获取当前纳秒
 func GetUnixNano() int64 {
-	return time.Now().UnixNano()
+	return Now().TimestampNano()
 }
 
 // 获取当前日期
-func GetDate() string {
-	template := "2006-01-02 15:04:05"
-	return time.Now().Format(template)
-}
-
-// 获取年月日
-func GetDay() string {
-	template := "20060102"
-	return time.Now().Format(template)
+// Y-m-d H:i:s,Y年m月d日 H时i分s秒...
+func GetDate(format string) string {
+	return Now().Format(format)
 }
 
 // 时间戳转日期
 func UnixToTime(timestamp int64) string {
-	t := time.Unix(timestamp, 0)
-	return t.Format("2006-01-02 15:04:05")
+	return carbon.CreateFromTimestamp(timestamp, carbon.PRC).Format("Y-m-d H:i:s")
 }
 
 // 日期转时间戳
 func DateToUnix(date string) int64 {
-	template := "2006-01-02 15:04:05"
-	t, err := time.ParseInLocation(template, date, time.Local)
-	if err != nil {
-		return 0
-	}
-	return t.Unix()
+	return carbon.Parse(date, carbon.PRC).Timestamp()
 }
 
 // 今日结束的时间
 func EndOfDay() string {
-	return gtime.Now().EndOfDay().String()
+	return Now().EndOfDay().ToDateTimeString()
+}
+
+// 今日结束的时间戳
+func EndOfDayTimestamp() int64 {
+	return Now().EndOfDay().Timestamp()
 }
 
 // 当前时间戳
 func NowTimestamp() int64 {
-	return gtime.Now().Timestamp()
+	return Now().Timestamp()
 }
 
 // 获取2个时间间隔的 秒/分/时/天/周/月/年
@@ -66,41 +62,46 @@ func NowTimestamp() int64 {
 // step 返回说明(1:秒 2:分 3:小时 4:天 5:周 6:月 7:年)
 func DateBetweenDiffStep(start_time string, end_time string, step int64) int64 {
 
+	var (
+		start = carbon.Parse(start_time, carbon.PRC)
+		end   = carbon.Parse(end_time, carbon.PRC)
+	)
+
 	switch step {
 	case 1:
 		// 秒
 
-		return carbon.Parse(end_time).DiffAbsInSeconds(carbon.Parse(start_time))
+		return end.DiffAbsInSeconds(start)
 
 	case 2:
 		// 分
 
-		return carbon.Parse(end_time).DiffAbsInMinutes(carbon.Parse(start_time))
+		return end.DiffAbsInMinutes(start)
 
 	case 3:
 		// 时
 
-		return carbon.Parse(end_time).DiffAbsInHours(carbon.Parse(start_time))
+		return end.DiffAbsInHours(start)
 
 	case 4:
 		// 天
 
-		return carbon.Parse(end_time).DiffAbsInDays(carbon.Parse(start_time))
+		return end.DiffAbsInDays(start)
 
 	case 5:
 		// 周
 
-		return carbon.Parse(end_time).DiffAbsInWeeks(carbon.Parse(start_time))
+		return end.DiffAbsInWeeks(start)
 
 	case 6:
 		// 月
 
-		return carbon.Parse(end_time).DiffAbsInMonths(carbon.Parse(start_time))
+		return end.DiffAbsInMonths(start)
 
 	case 7:
 		// 年
 
-		return carbon.Parse(end_time).DiffAbsInYears(carbon.Parse(start_time))
+		return end.DiffAbsInYears(start)
 
 	}
 
