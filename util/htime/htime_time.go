@@ -11,23 +11,23 @@ func Now() *carbon.Carbon {
 }
 
 // 获取当前时间戳/秒
-func GetUnix() int64 {
+func Unix() int64 {
 	return Now().Timestamp()
 }
 
 // 获取当前毫秒
-func GetUnixMilli() int64 {
+func UnixMilli() int64 {
 	return Now().TimestampMilli()
 }
 
 // 获取当前纳秒
-func GetUnixNano() int64 {
+func UnixNano() int64 {
 	return Now().TimestampNano()
 }
 
 // 获取当前日期
 // Y-m-d H:i:s,Y年m月d日 H时i分s秒...
-func GetDate(format string) string {
+func Date(format string) string {
 	return Now().Format(format)
 }
 
@@ -49,11 +49,6 @@ func EndOfDay() string {
 // 今日结束的时间戳
 func EndOfDayTimestamp() int64 {
 	return Now().EndOfDay().Timestamp()
-}
-
-// 当前时间戳
-func NowTimestamp() int64 {
-	return Now().Timestamp()
 }
 
 // 获取2个时间间隔的 秒/分/时/天/周/月/年
