@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net"
 	"regexp"
+	"strconv"
 )
 
 // 判断是否是 json 格式
@@ -59,4 +60,12 @@ func IsIPv6(address string) bool {
 	}
 
 	return ip.To4() == nil && len(ip) == net.IPv6len
+}
+
+// IsInteger 判断字符串是否是整数
+// 100 或 "100"	true
+// 100.0 或 "100.1"	false
+func IsInteger(s string) bool {
+	_, err := strconv.ParseInt(s, 10, 64)
+	return err == nil
 }
