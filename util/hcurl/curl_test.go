@@ -31,7 +31,7 @@ func TestGet(t *testing.T) {
 			"token": token,
 		},
 	}
-	s := o.CurlGet()
+	s, _ := o.CurlGet()
 	fmt.Printf("s: %v\n", s)
 }
 
@@ -44,7 +44,7 @@ func TestPost(t *testing.T) {
 			"password": "xxx",
 		},
 	}
-	s := o.CurlPost()
+	s, _ := o.CurlPost()
 	fmt.Printf("s: %v\n", s)
 }
 
