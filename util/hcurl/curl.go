@@ -1,7 +1,6 @@
 package hcurl
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/gogf/gf/v2/net/gclient"
@@ -30,7 +29,7 @@ func NewOption() *Options {
 }
 
 // CURL Get 请求
-func (o *Options) CurlGet() string {
+func (o *Options) CurlGet() (res string, err error) {
 
 	// Header
 	if o.Header != nil {
@@ -46,13 +45,12 @@ func (o *Options) CurlGet() string {
 		Get(ctx, o.Url, o.Params)
 
 	if err != nil {
-		fmt.Println(err)
-		errInfo := fmt.Sprintf("CURL Get 请求 失败:%v", err)
-		return errInfo
+		return
 	}
 	defer r.Close()
 
-	return r.ReadAllString()
+	res = r.ReadAllString()
+	return
 }
 
 // CURL Get 请求
@@ -81,7 +79,7 @@ func (o *Options) GetStatusCode() int {
 }
 
 // CURL Post 请求
-func (o *Options) CurlPost() string {
+func (o *Options) CurlPost() (res string, err error) {
 
 	// Header
 	if o.Header != nil {
@@ -94,15 +92,15 @@ func (o *Options) CurlPost() string {
 	r, err := client.
 		Timeout(time.Second*time.Duration(o.Timeout)).
 		BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-		Post(ctx, o.Url, o.Params)
+		PostForm(ctx, o.Url, gconv.MapStrStr(o.Params))
 
 	if err != nil {
-		errInfo := fmt.Sprintf("CURL Post 请求 失败:%v", err)
-		return errInfo
+		return
 	}
 	defer r.Close()
 
-	return r.ReadAllString()
+	res = r.ReadAllString()
+	return
 }
 
 // CURL PostJson 请求
