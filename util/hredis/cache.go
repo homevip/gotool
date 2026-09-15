@@ -13,48 +13,61 @@ import (
 var redisClient *redis.Client
 
 // InitRedis 初始化 Redis 客户端
-// 外部项目调用这个方法传入客户端，不再依赖内部 config 路径
+// 外部项目调用这个方法传入客户端,不再依赖内部 config 路径
 func InitRedis(client *redis.Client) {
 	redisClient = client
 }
 
 // 缓存函数
-// 参数1: key
-// 参数2: val
-// 参数3: 缓存时间/秒
-func S(any ...any) string {
-
-	// 安全判断
+// args规则:
+// S(key)          -> 获取缓存
+// S(key, val)     -> 设置永久缓存
+// S(key, val, sec)-> 设置缓存，sec秒过期
+func S(args ...any) string {
 	if redisClient == nil {
 		return ""
 	}
 
 	var (
-		ctx = context.Background()
-		len = len(any)
+		ctx  = context.Background()
+		argN = len(args)
 	)
 
-	// 获取值
-	if len == 1 {
-		var (
-			key = fmt.Sprint(any[0])
-		)
-
-		val, _ := redisClient.Get(ctx, key).Result()
+	switch argN {
+	case 1:
+		key := fmt.Sprint(args[0])
+		val, err := redisClient.Get(ctx, key).Result()
+		if err != nil {
+			// 可选:日志打印err,比如gf glog.Error(err)
+			return ""
+		}
 		return val
-	}
 
-	// 设置值
-	if len == 3 {
-		var (
-			key    = fmt.Sprint(any[0])
-			val    = gconv.String(any[1])
-			expire = time.Duration(gconv.Int(any[2])) * time.Second
-		)
-
-		_, _ = redisClient.Set(ctx, key, val, expire).Result() // 0 表示没有过期时间
+	case 2:
+		key := fmt.Sprint(args[0])
+		val := gconv.String(args[1])
+		// expire=0 永久不过期
+		_, err := redisClient.Set(ctx, key, val, 0).Result()
+		if err != nil {
+			// log err
+		}
 		return val
-	}
 
-	return ""
+	case 3:
+		key := fmt.Sprint(args[0])
+		val := gconv.String(args[1])
+		sec := gconv.Int(args[2])
+		if sec < 0 {
+			// 负数非法,直接返回原值,不写入缓存,可加日志
+			return val
+		}
+		expire := time.Duration(sec) * time.Second
+		_, err := redisClient.Set(ctx, key, val, expire).Result()
+		if err != nil {
+			// log err
+		}
+		return val
+	default:
+		return ""
+	}
 }

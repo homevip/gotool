@@ -8,52 +8,60 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-// 全局go-cache实例,对应原来的global.RedisDB
+// 全局 Cache 客户端(外部注入)
 var localCache *cache.Cache
 
 // 初始化本地缓存(建议在程序启动时调用)
-func InitLocalCache() {
-	// 默认过期时间设为0(永不过期),清理间隔设为5分钟
-	localCache = cache.New(0, 5*time.Minute)
+// 外部项目调用这个方法传入客户端,不再依赖内部 config 路径
+func InitLocalCache(client *cache.Cache) {
+	localCache = client
 }
 
-// 缓存函数
-// 参数1: key
-// 参数2: val
-// 参数3: 缓存时间/秒
-func S(any ...any) string {
-	var (
-		len = len(any)
-	)
-
+// LocalCache 本地缓存封装
+// args规则:
+// S(key)           -> 获取缓存
+// S(key, val)      -> 设置永久缓存
+// S(key, val, sec) -> 设置缓存，sec秒过期
+func S(args ...any) string {
 	// 初始化检查(防止未初始化就使用)
 	if localCache == nil {
-		InitLocalCache()
+		InitLocalCache(cache.New(0, 5*time.Minute))
 	}
 
-	// 获取值:仅传入key一个参数时
-	if len == 1 {
-		key := fmt.Sprint(any[0])
+	var (
+		argN = len(args)
+	)
+
+	switch argN {
+	case 1:
+		key := fmt.Sprint(args[0])
 		val, found := localCache.Get(key)
 		if found {
 			return gconv.String(val)
 		}
 		return ""
-	}
 
-	// 设置值:传入key、val、expire三个参数时
-	if len == 3 {
-		var (
-			key    = fmt.Sprint(any[0])
-			val    = gconv.String(any[1])
-			expire = time.Duration(gconv.Int(any[2])) * time.Second
-		)
+	case 2:
+		key := fmt.Sprint(args[0])
+		val := gconv.String(args[1])
+		// expire=0 永不过期
+		localCache.Set(key, val, 0)
+		return val
 
-		// go-cache中0秒表示永不过期(和Redis逻辑一致)
+	case 3:
+		key := fmt.Sprint(args[0])
+		val := gconv.String(args[1])
+		sec := gconv.Int(args[2])
+		if sec < 0 {
+			// 负数非法,直接返回原值,不写入缓存,可加日志
+			return val
+		}
+		expire := time.Duration(sec) * time.Second
 		localCache.Set(key, val, expire)
 		return val
-	}
 
-	// 参数数量错误时返回空字符串
-	return ""
+	default:
+		// 参数数量非法，返回空，可打错误日志
+		return ""
+	}
 }

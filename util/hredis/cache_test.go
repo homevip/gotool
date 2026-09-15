@@ -3,7 +3,6 @@ package hredis
 import (
 	"fmt"
 	"testing"
-	"time"
 )
 
 func TestS(t *testing.T) {
@@ -12,13 +11,13 @@ func TestS(t *testing.T) {
 	// hredis.InitRedis(config.GetRedisDB())
 
 	var (
-		CacheKey = "test_key"
-		CacheVal = time.Now().Format("2006-01-02 15:04:05")
+		cacheKey = "test_key"
+		cacheVal = "test-data"
 	)
 
-	cache := S(CacheKey)
+	cache := S(cacheKey)
 	if cache == "" {
-		cache = S(CacheKey, CacheVal, "100")
+		cache = S(cacheKey, cacheVal, 10)
 	}
 	fmt.Printf("cache: %v\n", cache)
 
