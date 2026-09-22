@@ -69,3 +69,11 @@ func IsInteger(s string) bool {
 	_, err := strconv.ParseInt(s, 10, 64)
 	return err == nil
 }
+
+// IsMatch 验证字符串是否符合正则表达式
+// pattern: 正则表达式模式
+// s: 目标字符串
+func IsMatch(pattern string, s string) bool {
+	matched, _ := regexp.MatchString(pattern, s)
+	return matched
+}
