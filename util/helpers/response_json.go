@@ -41,7 +41,7 @@ var (
 func OutSuccess(c *gin.Context, data any) {
 
 	if rj.Msg == "" {
-		rj.Msg = "成功"
+		rj.Msg = "succeed"
 	}
 
 	template(c, rj.Code, rj.Msg, data)
