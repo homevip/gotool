@@ -58,6 +58,7 @@ func (o *Options) CurlGet() (res string, err error) {
 	if err != nil {
 		return
 	}
+
 	defer r.Close()
 
 	res = r.ReadAllString()
@@ -76,10 +77,19 @@ func (o *Options) GetStatusCode() int {
 		}
 	}
 
-	r, err := client.
-		Timeout(time.Second*time.Duration(o.Timeout)).
-		BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-		Get(ctx, o.Url, o.Params)
+	if o.Auth_Basic_User != "" { // Basic Auth
+		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
+	}
+
+	if o.Auth_Bearer_Token != "" { // Bearer Token
+		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
+	}
+
+	if o.Timeout > 0 {
+		client.Timeout(time.Second * time.Duration(o.Timeout))
+	}
+
+	r, err := client.Get(ctx, o.Url, o.Params)
 
 	if err != nil {
 		return 0
@@ -100,10 +110,19 @@ func (o *Options) CurlPost() (res string, err error) {
 		}
 	}
 
-	r, err := client.
-		Timeout(time.Second*time.Duration(o.Timeout)).
-		BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-		PostForm(ctx, o.Url, gconv.MapStrStr(o.Params))
+	if o.Auth_Basic_User != "" { // Basic Auth
+		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
+	}
+
+	if o.Auth_Bearer_Token != "" { // Bearer Token
+		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
+	}
+
+	if o.Timeout > 0 {
+		client.Timeout(time.Second * time.Duration(o.Timeout))
+	}
+
+	r, err := client.PostForm(ctx, o.Url, gconv.MapStrStr(o.Params))
 
 	if err != nil {
 		return
@@ -125,12 +144,22 @@ func (o *Options) CurlPostJson() (res string, err error) {
 		}
 	}
 
+	if o.Auth_Basic_User != "" { // Basic Auth
+		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
+	}
+
+	if o.Auth_Bearer_Token != "" { // Bearer Token
+		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
+	}
+
+	if o.Timeout > 0 {
+		client.Timeout(time.Second * time.Duration(o.Timeout))
+	}
+		
+
 	JsonStr := gconv.String(o.Params)
 
-	r, err := client.
-		Timeout(time.Second*time.Duration(o.Timeout)).
-		BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-		Post(ctx, o.Url, JsonStr)
+	r, err := client.Post(ctx, o.Url, JsonStr)
 
 	if err != nil {
 		return
@@ -152,12 +181,22 @@ func (o *Options) CurlPutJson() (res string, err error) {
 		}
 	}
 
+	if o.Auth_Basic_User != "" { // Basic Auth
+		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
+	}
+
+	if o.Auth_Bearer_Token != "" { // Bearer Token
+		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
+	}
+
+	if o.Timeout > 0 {
+		client.Timeout(time.Second * time.Duration(o.Timeout))
+	}
+
+
 	JsonStr := gconv.String(o.Params)
 
-	r, err := client.
-		Timeout(time.Second*time.Duration(o.Timeout)).
-		BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-		Put(ctx, o.Url, JsonStr)
+	r, err := client.Put(ctx, o.Url, JsonStr)
 
 	if err != nil {
 		return
@@ -179,10 +218,19 @@ func (o *Options) CurlDelete() (res string, err error) {
 		}
 	}
 
-	r, err := client.
-		Timeout(time.Second*time.Duration(o.Timeout)).
-		BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-		Delete(ctx, o.Url)
+	if o.Auth_Basic_User != "" { // Basic Auth
+		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
+	}
+
+	if o.Auth_Bearer_Token != "" { // Bearer Token
+		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
+	}
+
+	if o.Timeout > 0 {
+		client.Timeout(time.Second * time.Duration(o.Timeout))
+	}
+
+	r, err := client.Delete(ctx, o.Url)
 
 	if err != nil {
 		return
