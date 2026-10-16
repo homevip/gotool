@@ -14,12 +14,13 @@ var (
 )
 
 type Options struct {
-	Url             string         // 请求地址
-	Params          any            // 参数
-	Header          map[string]any // Header 信息
-	Auth_Basic_User string         // Auth 校验信息
-	Auth_Basic_Pass string         // Auth 校验信息
-	Timeout         int            // 请求超时时间
+	Url               string         // 请求地址
+	Params            any            // 参数
+	Header            map[string]any // Header 信息
+	Auth_Basic_User   string         // Auth 校验信息
+	Auth_Basic_Pass   string         // Auth 校验信息
+	Auth_Bearer_Token string         // Bearer Token
+	Timeout           int            // 请求超时时间
 }
 
 func NewOption() *Options {
@@ -39,10 +40,20 @@ func (o *Options) CurlGet() (res string, err error) {
 		}
 	}
 
-	r, err := client.
-		Timeout(time.Second*time.Duration(o.Timeout)).
-		BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-		Get(ctx, o.Url, o.Params)
+	
+	if o.Auth_Basic_User != "" { // Basic Auth
+		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
+	}
+
+	if o.Auth_Bearer_Token != "" { // Bearer Token
+		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
+	}
+
+	if o.Timeout > 0 {
+		client.Timeout(time.Second * time.Duration(o.Timeout))
+	}
+
+	r, err := client.Get(ctx, o.Url, o.Params)
 
 	if err != nil {
 		return
