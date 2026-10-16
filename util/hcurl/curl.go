@@ -44,13 +44,13 @@ func (o *Options) newClient() *gclient.Client {
 	}
 
 	// Basic Auth
-	if o.Auth_Basic_User != "" {
-		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass)
+	if o.AuthBasicUser != "" {
+		client.BasicAuth(o.AuthBasicUser, o.AuthBasicPass)
 	}
 
 	// Bearer Token
-	if o.Auth_Bearer_Token != "" {
-		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
+	if o.AuthBearerToken != "" {
+		client.SetHeader("Authorization", "Bearer "+o.AuthBearerToken)
 	}
 
 	// 请求超时时间
