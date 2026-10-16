@@ -13,13 +13,13 @@ var (
 )
 
 type Options struct {
-	Url               string         // 请求地址
-	Params            any            // 参数
-	Header            map[string]any // Header 信息
-	Auth_Basic_User   string         // Basic Auth 账号
-	Auth_Basic_Pass   string         // Basic Auth 密码
-	Auth_Bearer_Token string         // Bearer Token
-	Timeout           int            // 请求超时时间
+	Url             string         // 请求地址
+	Params          any            // 参数
+	Header          map[string]any // Header 信息
+	AuthBasicUser   string         // Basic Auth 账号
+	AuthBasicPass   string         // Basic Auth 密码
+	AuthBearerToken string         // Bearer Token
+	Timeout         int            // 请求超时时间
 }
 
 func NewOption() *Options {
@@ -80,18 +80,18 @@ func (o *Options) CurlGet() (res string, err error) {
 
 // CURL Get 请求
 // 获取状态码
-func (o *Options) GetStatusCode() int {
+func (o *Options) GetStatusCode() (code int, err error) {
 
 	client := o.newClient()
 
 	r, err := client.Get(ctx, o.Url, o.Params)
 
 	if err != nil {
-		return 0
+		return 0, err
 	}
 	defer r.Close()
 
-	return r.StatusCode
+	return r.StatusCode, nil
 }
 
 // CURL Post 请求
