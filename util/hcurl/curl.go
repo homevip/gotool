@@ -16,8 +16,8 @@ type Options struct {
 	Url               string         // 请求地址
 	Params            any            // 参数
 	Header            map[string]any // Header 信息
-	Auth_Basic_User   string         // Auth 校验信息
-	Auth_Basic_Pass   string         // Auth 校验信息
+	Auth_Basic_User   string         // Basic Auth 账号
+	Auth_Basic_Pass   string         // Basic Auth 密码
 	Auth_Bearer_Token string         // Bearer Token
 	Timeout           int            // 请求超时时间
 }
@@ -115,9 +115,7 @@ func (o *Options) CurlPostJson() (res string, err error) {
 
 	client := o.newClient()
 
-	JsonStr := gconv.String(o.Params)
-
-	r, err := client.Post(ctx, o.Url, JsonStr)
+	r, err := client.Post(ctx, o.Url, gconv.String(o.Params))
 
 	if err != nil {
 		return
@@ -133,9 +131,7 @@ func (o *Options) CurlPutJson() (res string, err error) {
 
 	client := o.newClient()
 
-	JsonStr := gconv.String(o.Params)
-
-	r, err := client.Put(ctx, o.Url, JsonStr)
+	r, err := client.Put(ctx, o.Url, gconv.String(o.Params))
 
 	if err != nil {
 		return
