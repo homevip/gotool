@@ -9,8 +9,7 @@ import (
 )
 
 var (
-	ctx    = gctx.New()
-	client = gclient.New()
+	ctx = gctx.New()
 )
 
 type Options struct {
@@ -29,29 +28,43 @@ func NewOption() *Options {
 	}
 }
 
-// CURL Get 请求
-func (o *Options) CurlGet() (res string, err error) {
+// 创建客户端
+func (o *Options) newClient() *gclient.Client {
+
+	client := gclient.New()
 
 	// Header
 	if o.Header != nil {
 		for k, v := range o.Header {
 			s := gconv.Strings(v)
-			client.SetHeader(k, s[0])
+			if len(s) > 0 {
+				client.SetHeader(k, s[0])
+			}
 		}
 	}
 
-	
-	if o.Auth_Basic_User != "" { // Basic Auth
-		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
+	// Basic Auth
+	if o.Auth_Basic_User != "" {
+		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass)
 	}
 
-	if o.Auth_Bearer_Token != "" { // Bearer Token
+	// Bearer Token
+	if o.Auth_Bearer_Token != "" {
 		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
 	}
 
+	// 请求超时时间
 	if o.Timeout > 0 {
 		client.Timeout(time.Second * time.Duration(o.Timeout))
 	}
+
+	return client
+}
+
+// CURL Get 请求
+func (o *Options) CurlGet() (res string, err error) {
+
+	client := o.newClient()
 
 	r, err := client.Get(ctx, o.Url, o.Params)
 
@@ -69,25 +82,7 @@ func (o *Options) CurlGet() (res string, err error) {
 // 获取状态码
 func (o *Options) GetStatusCode() int {
 
-	// Header
-	if o.Header != nil {
-		for k, v := range o.Header {
-			s := gconv.Strings(v)
-			client.SetHeader(k, s[0])
-		}
-	}
-
-	if o.Auth_Basic_User != "" { // Basic Auth
-		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-	}
-
-	if o.Auth_Bearer_Token != "" { // Bearer Token
-		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
-	}
-
-	if o.Timeout > 0 {
-		client.Timeout(time.Second * time.Duration(o.Timeout))
-	}
+	client := o.newClient()
 
 	r, err := client.Get(ctx, o.Url, o.Params)
 
@@ -102,25 +97,7 @@ func (o *Options) GetStatusCode() int {
 // CURL Post 请求
 func (o *Options) CurlPost() (res string, err error) {
 
-	// Header
-	if o.Header != nil {
-		for k, v := range o.Header {
-			s := gconv.Strings(v)
-			client.SetHeader(k, s[0])
-		}
-	}
-
-	if o.Auth_Basic_User != "" { // Basic Auth
-		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-	}
-
-	if o.Auth_Bearer_Token != "" { // Bearer Token
-		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
-	}
-
-	if o.Timeout > 0 {
-		client.Timeout(time.Second * time.Duration(o.Timeout))
-	}
+	client := o.newClient()
 
 	r, err := client.PostForm(ctx, o.Url, gconv.MapStrStr(o.Params))
 
@@ -136,26 +113,7 @@ func (o *Options) CurlPost() (res string, err error) {
 // CURL PostJson 请求
 func (o *Options) CurlPostJson() (res string, err error) {
 
-	// Header
-	if o.Header != nil {
-		for k, v := range o.Header {
-			s := gconv.Strings(v)
-			client.SetHeader(k, s[0])
-		}
-	}
-
-	if o.Auth_Basic_User != "" { // Basic Auth
-		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-	}
-
-	if o.Auth_Bearer_Token != "" { // Bearer Token
-		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
-	}
-
-	if o.Timeout > 0 {
-		client.Timeout(time.Second * time.Duration(o.Timeout))
-	}
-		
+	client := o.newClient()
 
 	JsonStr := gconv.String(o.Params)
 
@@ -173,26 +131,7 @@ func (o *Options) CurlPostJson() (res string, err error) {
 // CURL PutJson 请求
 func (o *Options) CurlPutJson() (res string, err error) {
 
-	// Header
-	if o.Header != nil {
-		for k, v := range o.Header {
-			s := gconv.Strings(v)
-			client.SetHeader(k, s[0])
-		}
-	}
-
-	if o.Auth_Basic_User != "" { // Basic Auth
-		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-	}
-
-	if o.Auth_Bearer_Token != "" { // Bearer Token
-		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
-	}
-
-	if o.Timeout > 0 {
-		client.Timeout(time.Second * time.Duration(o.Timeout))
-	}
-
+	client := o.newClient()
 
 	JsonStr := gconv.String(o.Params)
 
@@ -210,25 +149,7 @@ func (o *Options) CurlPutJson() (res string, err error) {
 // CURL Delete 请求
 func (o *Options) CurlDelete() (res string, err error) {
 
-	// Header
-	if o.Header != nil {
-		for k, v := range o.Header {
-			s := gconv.Strings(v)
-			client.SetHeader(k, s[0])
-		}
-	}
-
-	if o.Auth_Basic_User != "" { // Basic Auth
-		client.BasicAuth(o.Auth_Basic_User, o.Auth_Basic_Pass).
-	}
-
-	if o.Auth_Bearer_Token != "" { // Bearer Token
-		client.SetHeader("Authorization", "Bearer "+o.Auth_Bearer_Token)
-	}
-
-	if o.Timeout > 0 {
-		client.Timeout(time.Second * time.Duration(o.Timeout))
-	}
+	client := o.newClient()
 
 	r, err := client.Delete(ctx, o.Url)
 
